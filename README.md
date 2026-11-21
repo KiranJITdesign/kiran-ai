@@ -261,4 +261,5 @@ KiranAI is built to be discoverable and invocable by external AI coding agents (
 
 For inquiries, bugs, or feature proposals, open an issue on the [GitHub Issues](https://github.com/skiran/KiranAI/issues) page.
 #   k i r a n - a i  
+ #   k i r a n - a i  
  
