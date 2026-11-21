@@ -1,0 +1,80 @@
+"""Persistent, explicit backend selection for KiranAI chat."""
+from __future__ import annotations
+
+import json
+import os
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Optional
+
+
+@dataclass
+class ChatSettings:
+    schema_version: int = 2
+    backend: str = 'local'
+    model_file: str = ''
+    nano_checkpoint: str = ''
+    nano_tokenizer: str = ''
+    ollama_model: str = ''
+    ollama_host: str = 'http://127.0.0.1:11434'
+    openjev_checkpoint: str = ''
+    answer_confidence_artifact: str = ''
+    show_confidence: bool = True
+
+    def validate(self) -> None:
+        if self.schema_version != 2:
+            raise ValueError('Unsupported settings version')
+        if self.backend not in ('local', 'nano', 'ollama'):
+            raise ValueError('backend must be local, nano (research), or ollama')
+        if not self.ollama_host.startswith(('http://', 'https://')):
+            raise ValueError('ollama_host must be an HTTP or HTTPS URL')
+        if not isinstance(self.show_confidence, bool):
+            raise ValueError('show_confidence must be true or false')
+
+
+def settings_path() -> Path:
+    if 'KIRANAI_DATA_DIR' in os.environ:
+        return Path(os.environ['KIRANAI_DATA_DIR']) / 'settings.json'
+    try:
+        home_path = Path.home() / '.kiran_ai'
+        if not home_path.exists():
+            home_path.mkdir(parents=True, exist_ok=True)
+        return home_path / 'settings.json'
+    except (PermissionError, OSError):
+        fallback = Path.cwd() / '.kiran_ai'
+        try:
+            fallback.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError):
+            pass
+        return fallback / 'settings.json'
+
+
+def load_settings(path: Optional[Path] = None) -> ChatSettings:
+    try:
+        path = path or settings_path()
+        if not path.exists():
+            return ChatSettings()
+        values = json.loads(path.read_text(encoding='utf-8'))
+        if 'schema_version' not in values:
+            # Retire only the old implicit research default. Preserve custom Nano
+            # checkpoints and explicit Ollama selection during the upgrade.
+            if values.get('backend') == 'nano' and not values.get('nano_checkpoint'):
+                values['backend'] = 'local'
+            values['schema_version'] = 2
+        settings = ChatSettings(**values)
+        settings.validate()
+        return settings
+    except (PermissionError, OSError, ValueError, KeyError):
+        return ChatSettings()
+
+
+def save_settings(settings: ChatSettings, path: Optional[Path] = None) -> None:
+    settings.validate()
+    try:
+        path = path or settings_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_suffix('.tmp')
+        temporary.write_text(json.dumps(asdict(settings), indent=2) + '\n', encoding='utf-8')
+        os.replace(temporary, path)
+    except (PermissionError, OSError):
+        pass

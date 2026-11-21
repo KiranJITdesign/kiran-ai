@@ -1,0 +1,178 @@
+"""Unit tests for the KiranAI standalone CLI interface."""
+
+import subprocess
+import io
+import importlib
+import os
+import sys
+import unittest
+from unittest.mock import patch
+
+
+class TestHariCLI(unittest.TestCase):
+    def test_interactive_launch_defaults_to_dashboard(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        with patch.object(cli.sys.stdin, 'isatty', return_value=True), \
+                patch.object(cli.sys.stdout, 'isatty', return_value=True), \
+                patch.dict(os.environ, {'TERM': 'xterm-256color'}), \
+                patch('kiran_ai.cli.dashboard.KiranDashboard') as dashboard, patch.object(cli, 'repl') as plain:
+            cli.launch_chat()
+            dashboard.return_value.run.assert_called_once()
+            plain.assert_not_called()
+
+    def test_plain_and_redirected_launch_do_not_start_dashboard(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        with patch.object(cli, 'repl') as plain, patch('kiran_ai.cli.dashboard.KiranDashboard') as dashboard:
+            cli.launch_chat(plain=True)
+            with patch.object(cli.sys.stdin, 'isatty', return_value=False):
+                cli.launch_chat()
+            self.assertEqual(plain.call_count, 2)
+            dashboard.assert_not_called()
+
+    def test_grand_returns_from_silent_terminal_to_dashboard(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        with patch.object(cli, 'get_user_input', return_value='/grand'), \
+                patch.object(cli, 'print_banner'), patch.object(cli, 'cmd_status'), \
+                patch.object(cli._DREAM_CONTROLLER, 'start_auto_dreamer'), \
+                patch.object(cli._DREAM_CONTROLLER, 'notify_user_activity'):
+            self.assertEqual(cli.repl(), 'switch_to_dashboard')
+
+    def test_plain_repl_prompts_for_convert_source_then_runs_it(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        with patch.object(cli, 'get_user_input', side_effect=['/convert', r'C:\\Docs\\notes.txt', '/exit']), \
+                patch.object(cli, 'print_banner'), patch.object(cli, 'cmd_status'), \
+                patch.object(cli._DREAM_CONTROLLER, 'start_auto_dreamer'), \
+                patch.object(cli._DREAM_CONTROLLER, 'notify_user_activity'), \
+                patch.object(cli, 'cmd_convert') as convert:
+            with self.assertRaises(SystemExit):
+                cli.repl()
+        convert.assert_called_once_with([r'C:\\Docs\\notes.txt'])
+
+    def test_dashboard_settings_preserve_quoted_windows_path(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        with patch.object(cli, 'cmd_settings') as settings:
+            cli.dashboard_command('/settings', 'model-file "C:\\My Models\\assistant.gguf"')
+            self.assertEqual(settings.call_args.args[0], ['model-file', 'C:\\My Models\\assistant.gguf'])
+
+    def test_confidence_is_grey_in_terminal_and_plain_with_no_color(self):
+        cli = importlib.import_module('kiran_ai.cli.main')
+        class Terminal(io.StringIO):
+            def isatty(self):
+                return True
+        output = Terminal()
+        with patch.object(cli._CHAT_ENGINE.settings, 'show_confidence', True), \
+                patch.object(cli._CHAT_ENGINE, 'last_reply_succeeded', True), \
+                patch.object(cli.sys, 'stdout', output), patch.dict(os.environ, {}, clear=True):
+            cli._show_confidence_status()
+            self.assertEqual(output.getvalue(), '\x1b[90mToken likelihood: unavailable\x1b[0m\n')
+            output.seek(0)
+            output.truncate(0)
+            with patch.dict(os.environ, {'NO_COLOR': '1'}):
+                cli._show_confidence_status()
+                self.assertEqual(output.getvalue(), 'Token likelihood: unavailable\n')
+            output.seek(0)
+            output.truncate(0)
+            with patch.object(cli._CHAT_ENGINE, 'last_answer_confidence', .73):
+                cli._show_confidence_status()
+                self.assertEqual(output.getvalue(), '\x1b[90mConfidence: 73% (arithmetic only)\x1b[0m\n')
+            output.seek(0)
+            output.truncate(0)
+            with patch.object(cli._CHAT_ENGINE, 'last_answer_confidence', 0.0), \
+                    patch.object(cli._CHAT_ENGINE, 'last_confidence_source', 'verified arithmetic'):
+                cli._show_confidence_status()
+                self.assertEqual(output.getvalue(), '\x1b[90mConfidence: 0% (verified arithmetic)\x1b[0m\n')
+            output.seek(0)
+            output.truncate(0)
+            with patch.object(cli._CHAT_ENGINE, 'last_token_likelihood', .725):
+                cli._show_confidence_status()
+                self.assertEqual(output.getvalue(), '\x1b[90mToken likelihood: 72%\x1b[0m\n')
+
+    def test_direct_identity_shows_unavailable_confidence(self):
+        proc = subprocess.run([sys.executable, '-m', 'kiran_ai.cli', 'ask', 'who are u?'],
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn('S Kiran', proc.stdout)
+        self.assertIn('Token likelihood: unavailable', proc.stdout)
+        self.assertNotIn('%', proc.stdout)
+    def test_cli_info_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "info"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn("S Kiran", proc.stdout)
+        self.assertIn("Under 35 MB", proc.stdout)
+        self.assertIn("21 years old", proc.stdout)
+
+    def test_status_reports_real_backend_and_experimental_learning(self):
+        proc = subprocess.run([sys.executable, '-m', 'kiran_ai.cli', 'status'],
+                              capture_output=True, text=True, timeout=30)
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn('KiranAI status', proc.stdout)
+        self.assertIn('no automatic model updates', proc.stdout)
+        self.assertIn('answer accuracy is not calibrated', proc.stdout)
+
+    def test_cli_version_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "version"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        from kiran_ai.version import __version__
+        self.assertIn(f"KiranAI version {__version__}", proc.stdout)
+
+    def test_repl_reports_running_version(self):
+        from kiran_ai.version import __version__
+        proc = subprocess.run([sys.executable, '-m', 'kiran_ai.cli'],
+                              input='/version\n/exit\n', capture_output=True, text=True, timeout=30)
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn(f'KiranAI v{__version__}', proc.stdout)
+        self.assertIn(f'KiranAI version {__version__}', proc.stdout)
+
+    def test_cli_decide_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "decide", "Mass deletion requested"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn("Choice", proc.stdout)
+        self.assertIn("Score", proc.stdout)
+        self.assertIn("Noul", proc.stdout)
+        self.assertIn("REQUIRES APPROVAL", proc.stdout)
+
+    def test_cli_dream_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "dream", "now"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn("KiranAI Dream Engine", proc.stdout)
+        self.assertIn("Dream cycle completed", proc.stdout)
+
+    def test_cli_think_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "think", "Sort array in O(n log n)"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertNotIn("[Verified Solution]", proc.stdout)
+
+    def test_cli_search_command(self):
+        proc = subprocess.run(
+            [sys.executable, "-m", "kiran_ai.cli", "search", "transformer attention"],
+            capture_output=True,
+            text=True,
+        )
+        self.assertEqual(proc.returncode, 0)
+        self.assertIn("KiranNano Search Engine", proc.stdout)
+        self.assertIn("Search & Research", proc.stdout)
+
+
+if __name__ == "__main__":
+    unittest.main()
+

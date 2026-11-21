@@ -1,0 +1,21 @@
+PackageIdentifier: skiran.KiranAI
+PackageVersion: 0.1.0
+PackageName: KiranAI
+Publisher: S Kiran
+PublisherUrl: https://github.com/skiran
+License: Apache-2.0
+LicenseUrl: https://github.com/skiran/KiranAI/blob/master/LICENSE
+ShortDescription: KiranAI is an original, open-weight, extremely small AI system with model weights under 50 MB.
+Tags:
+  - ai
+  - machine-learning
+  - transformer
+  - edge-ai
+  - decision-engine
+Installers:
+  - Architecture: x64
+    InstallerType: portable
+    InstallerUrl: https://github.com/skiran/KiranAI/releases/download/v0.1.0/hari-win64.zip
+ManifestType: singleton
+ManifestVersion: 1.4.0
+

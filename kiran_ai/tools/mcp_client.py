@@ -1,0 +1,313 @@
+"""Model Context Protocol (MCP) Client for KiranAI.
+
+Implements JSON-RPC 2.0 stdio client protocol for discovering and invoking
+tools from local and external MCP servers (compatible with Claude, Cursor,
+and Antigravity MCP specifications).
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+import atexit
+import json
+import os
+from pathlib import Path
+import queue
+import subprocess
+import threading
+import time
+from typing import Any, Dict, List, Optional
+
+
+@dataclass
+class MCPServerConfig:
+    name: str
+    command: str
+    args: List[str] = field(default_factory=list)
+    env: Dict[str, str] = field(default_factory=dict)
+    cwd: Optional[str] = None
+    enabled: bool = True
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "command": self.command,
+            "args": self.args,
+            "env": self.env,
+            "cwd": self.cwd,
+            "enabled": self.enabled,
+        }
+
+    @classmethod
+    def from_dict(cls, name: str, data: Dict[str, Any]) -> MCPServerConfig:
+        return cls(
+            name=name,
+            command=data.get("command", ""),
+            args=data.get("args", []),
+            env=data.get("env", {}),
+            cwd=data.get("cwd"),
+            enabled=data.get("enabled", True),
+        )
+
+
+@dataclass
+class MCPTool:
+    name: str
+    description: str
+    parameters: Dict[str, Any]
+    server_name: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "description": self.description,
+            "parameters": self.parameters,
+            "server": self.server_name,
+        }
+
+
+def get_mcp_config_path() -> Path:
+    if "KIRANAI_HOME" in os.environ:
+        base = Path(os.environ["KIRANAI_HOME"])
+    else:
+        try:
+            base = Path.home() / ".kiran_ai"
+            base.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError):
+            base = Path.cwd() / ".kiran_ai"
+    try:
+        base.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        pass
+    return base / "mcp_servers.json"
+
+
+def load_mcp_config() -> Dict[str, MCPServerConfig]:
+    path = get_mcp_config_path()
+    if not path.is_file():
+        return {}
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        servers_data = raw.get("mcpServers", raw)
+        return {
+            name: MCPServerConfig.from_dict(name, conf)
+            for name, conf in servers_data.items()
+            if isinstance(conf, dict) and "command" in conf
+        }
+    except Exception:
+        return {}
+
+
+def save_mcp_config(configs: Dict[str, MCPServerConfig]) -> None:
+    path = get_mcp_config_path()
+    data = {"mcpServers": {name: conf.to_dict() for name, conf in configs.items()}}
+    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+
+class MCPClient:
+    """Manages an active connection to an MCP server over stdio."""
+
+    def __init__(self, config: MCPServerConfig):
+        self.config = config
+        self.proc: Optional[subprocess.Popen] = None
+        self._req_id = 0
+        self._lock = threading.Lock()
+        self._tools: List[MCPTool] = []
+        self._server_info: Dict[str, Any] = {}
+        self._responses: queue.Queue[str | None] = queue.Queue()
+        self._reader_thread: Optional[threading.Thread] = None
+        self._stderr_thread: Optional[threading.Thread] = None
+
+    def start(self, timeout: float = 10.0) -> bool:
+        """Starts the MCP server process and completes the protocol handshake."""
+        if not self.config.command:
+            return False
+
+        env = os.environ.copy()
+        env.update(self.config.env)
+
+        cmd = [self.config.command] + self.config.args
+        try:
+            self.proc = subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                bufsize=1,
+                cwd=self.config.cwd or None,
+                env=env,
+            )
+        except Exception:
+            return False
+
+        # Drain stdout and stderr continuously. A direct readline() in the
+        # request path can otherwise block past the advertised timeout or let
+        # verbose servers deadlock on a full stderr pipe.
+        self._reader_thread = threading.Thread(target=self._read_stdout, daemon=True,
+                                               name=f'KiranAI-MCP-{self.config.name}-stdout')
+        self._stderr_thread = threading.Thread(target=self._drain_stderr, daemon=True,
+                                               name=f'KiranAI-MCP-{self.config.name}-stderr')
+        self._reader_thread.start()
+        self._stderr_thread.start()
+        atexit.register(self.stop)
+
+        # Protocol handshake: initialize
+        init_req = {
+            "jsonrpc": "2.0",
+            "id": self._next_id(),
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {"tools": {}},
+                "clientInfo": {"name": "KiranAI", "version": "0.2.0"},
+            },
+        }
+        res = self._send_request(init_req, timeout=timeout)
+        if not res or "result" not in res:
+            self.stop()
+            return False
+
+        self._server_info = res["result"].get("serverInfo", {})
+
+        # Notification: initialized
+        self._send_notification({"jsonrpc": "2.0", "method": "notifications/initialized"})
+        return True
+
+    def stop(self) -> None:
+        """Gracefully terminates the MCP server process."""
+        if self.proc:
+            proc = self.proc
+            self.proc = None
+            try:
+                proc.terminate()
+                proc.wait(timeout=2.0)
+            except Exception:
+                try:
+                    proc.kill()
+                except Exception:
+                    pass
+            for stream in (proc.stdin, proc.stdout, proc.stderr):
+                try:
+                    if stream:
+                        stream.close()
+                except (OSError, ValueError):
+                    pass
+
+    def _read_stdout(self) -> None:
+        proc = self.proc
+        if not proc or not proc.stdout:
+            return
+        try:
+            for line in proc.stdout:
+                self._responses.put(line)
+        except (OSError, ValueError):
+            pass
+        finally:
+            self._responses.put(None)
+
+    def _drain_stderr(self) -> None:
+        proc = self.proc
+        if not proc or not proc.stderr:
+            return
+        try:
+            for _ in proc.stderr:
+                pass
+        except (OSError, ValueError):
+            pass
+
+    def list_tools(self, timeout: float = 5.0) -> List[MCPTool]:
+        """Discovers tools available on the MCP server."""
+        if not self.proc:
+            return []
+        req = {
+            "jsonrpc": "2.0",
+            "id": self._next_id(),
+            "method": "tools/list",
+            "params": {},
+        }
+        res = self._send_request(req, timeout=timeout)
+        if not res or "result" not in res:
+            return []
+
+        raw_tools = res["result"].get("tools", [])
+        tools: List[MCPTool] = []
+        for t in raw_tools:
+            name = t.get("name", "")
+            if name:
+                tools.append(
+                    MCPTool(
+                        name=name,
+                        description=t.get("description", ""),
+                        parameters=t.get("inputSchema", {}),
+                        server_name=self.config.name,
+                    )
+                )
+        self._tools = tools
+        return tools
+
+    def call_tool(self, name: str, arguments: Dict[str, Any], timeout: float = 30.0,
+                  stop_event: Optional[threading.Event] = None) -> Dict[str, Any]:
+        """Calls a tool on the MCP server and returns the result."""
+        if not self.proc:
+            return {"isError": True, "content": [{"type": "text", "text": "MCP server is not running."}]}
+
+        req = {
+            "jsonrpc": "2.0",
+            "id": self._next_id(),
+            "method": "tools/call",
+            "params": {"name": name, "arguments": arguments},
+        }
+        res = self._send_request(req, timeout=timeout, stop_event=stop_event)
+        if not res:
+            return {"isError": True, "content": [{"type": "text", "text": "MCP call timed out or failed."}]}
+        if "error" in res:
+            return {"isError": True, "content": [{"type": "text", "text": str(res["error"])}]}
+        return res.get("result", {})
+
+    def _next_id(self) -> int:
+        with self._lock:
+            self._req_id += 1
+            return self._req_id
+
+    def _send_notification(self, payload: Dict[str, Any]) -> None:
+        if not self.proc or not self.proc.stdin:
+            return
+        try:
+            with self._lock:
+                self.proc.stdin.write(json.dumps(payload) + "\n")
+                self.proc.stdin.flush()
+        except Exception:
+            pass
+
+    def _send_request(self, payload: Dict[str, Any], timeout: float = 10.0,
+                      stop_event: Optional[threading.Event] = None) -> Optional[Dict[str, Any]]:
+        if not self.proc or not self.proc.stdin or not self.proc.stdout:
+            return None
+        try:
+            with self._lock:
+                line = json.dumps(payload) + "\n"
+                self.proc.stdin.write(line)
+                self.proc.stdin.flush()
+                deadline = time.monotonic() + timeout
+                while True:
+                    if stop_event is not None and stop_event.is_set():
+                        return None
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0 or self.proc.poll() is not None:
+                        return None
+                    try:
+                        resp_line = self._responses.get(timeout=min(remaining, 0.1 if stop_event else remaining))
+                    except queue.Empty:
+                        if stop_event is not None and not stop_event.is_set():
+                            continue
+                        return None
+                    if resp_line is None:
+                        return None
+                    try:
+                        data = json.loads(resp_line)
+                    except (json.JSONDecodeError, TypeError):
+                        continue
+                    if isinstance(data, dict) and data.get("id") == payload.get("id"):
+                        return data
+        except Exception:
+            return None
+
