@@ -2,7 +2,7 @@
 
 **Local AI by S Kiran — Standalone Edge Intelligence, Autonomous Desktop Control, and Universal Document Systems.**
 
-<img width="1917" height="1057" alt="image" src="https://github.com/user-attachments/assets/8f370fec-154a-4f9e-86c5-146961681abd" />
+
 
 [![PyPI version](https://img.shields.io/pypi/v/kiran-ai.svg?color=c17aff)](https://pypi.org/project/kiran-ai/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
@@ -260,6 +260,8 @@ KiranAI is built to be discoverable and invocable by external AI coding agents (
 * **Third-Party Notices**: Upstream model weights and vendored components preserve their respective Apache 2.0 licenses. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [DATA_LICENSES.md](DATA_LICENSES.md).
 
 For inquiries, bugs, or feature proposals, open an issue on the [GitHub Issues](https://github.com/skiran/KiranAI/issues) page.
-#   k i r a n - a i  
- #   k i r a n - a i  
+#   k i r a n - a i 
+ 
+ #   k i r a n - a i 
+ 
  
