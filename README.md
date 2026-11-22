@@ -60,7 +60,7 @@ KiranAI automatically detects Google Colab, Kaggle, and Jupyter notebook environ
 
 KiranAI provides a keyboard- and mouse-friendly dual-pane terminal interface built using Textual and Rich with a purple theme.
 
-![KiranAI live terminal dashboard](docs/images/terminal-dashboard.png)
+
 
 ### Dashboard Features
 
