@@ -8,11 +8,21 @@ from pathlib import Path
 from contextlib import nullcontext
 from typing import Iterator, Optional
 
-from kiran_ai.runtime.hardware import detect_hardware
+from kiran_ai.runtime.hardware import detect_hardware, preload_windows_dlls
 
 
 def bundled_model_path() -> Path:
-    return Path(__file__).resolve().parents[1] / 'assets' / 'kiranai-chat.gguf'
+    bundled = Path(__file__).resolve().parents[1] / 'assets' / 'kiranai-chat.gguf'
+    if bundled.is_file():
+        return bundled
+    try:
+        from kiran_ai.runtime.model_store import default_model_path
+        downloaded = default_model_path()
+        if downloaded.is_file():
+            return downloaded
+    except Exception:
+        pass
+    return bundled
 
 
 class LocalModel:
@@ -26,6 +36,7 @@ class LocalModel:
         repeat_penalty: float = 1.25,
         max_tokens: int = 512,
     ):
+        self._explicit_path = bool(path)
         self.path = Path(path).expanduser() if path else bundled_model_path()
         self.context_size = context_size
         self.threads = threads
@@ -61,8 +72,14 @@ class LocalModel:
     def _load(self):
         if self._model is None:
             if not self.path.is_file():
-                raise FileNotFoundError('KiranAI model is missing. Install the model-bearing wheel or '
-                                        'use `kiran settings model-file PATH.gguf`.')
+                if not self._explicit_path:
+                    fallback = bundled_model_path()
+                    if fallback.is_file():
+                        self.path = fallback
+                if not self.path.is_file():
+                    raise FileNotFoundError('KiranAI model is missing. Install the model-bearing wheel or '
+                                            'use `kiran settings model-file PATH.gguf`.')
+            preload_windows_dlls()
             try:
                 import llama_cpp
                 from llama_cpp import Llama

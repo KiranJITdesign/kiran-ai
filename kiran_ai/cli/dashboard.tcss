@@ -1,54 +1,54 @@
 Screen {
-    background: #09070f;
-    color: #eee8f5;
+    background: #0f0a06;
+    color: #f5eee8;
 }
 #titlebar {
     height: 1;
-    background: #251a34;
-    color: #e9ddef;
+    background: #2e1705;
+    color: #ffeedd;
     padding: 0 1;
 }
 #lights { width: 8; }
 #window-title { width: 1fr; text-align: center; }
-#version { width: 12; text-align: right; color: #c9a3ee; }
+#version { width: 12; text-align: right; color: #ffb066; }
 #workspace { height: 1fr; padding: 1 1 0 1; }
 #main-pane { width: 1fr; padding-right: 2; }
-#conversation { height: 1fr; scrollbar-size: 1 1; scrollbar-color: #6d438e; scrollbar-background: #120d1c; }
+#conversation { height: 1fr; scrollbar-size: 1 1; scrollbar-color: #994d00; scrollbar-background: #1a0f05; }
 #brand { height: auto; margin: 0 0 1 0; text-align: center; }
 .panel {
     height: auto;
-    border: round #a66ddd;
-    border-title-color: #d29dff;
+    border: round #ff7700;
+    border-title-color: #ffaa33;
     border-title-style: bold;
     border-subtitle-color: #8bdfaa;
     padding: 0 1;
     margin-bottom: 1;
-    background: #0c0912;
+    background: #140c06;
 }
 #overview { margin: 0 1 1 1; }
 #messages { height: auto; }
 .turn { height: auto; margin: 0 1 1 1; }
-.user-turn { background: #20162f; }
-.user-line { height: auto; padding: 0 1; color: #f4eafa; }
+.user-turn { background: #2b1605; }
+.user-line { height: auto; padding: 0 1; color: #fff5eb; }
 .reply-body { height: auto; }
-.reply-note { height: auto; padding-left: 2; color: #93889f; }
+.reply-note { height: auto; padding-left: 2; color: #b39a88; }
 .creator-card { margin: 0 2 1 3; }
-#activity { height: 1; padding-left: 1; color: #93889f; }
+#activity { height: 1; padding-left: 1; color: #b39a88; }
 #prompt {
     height: 3;
     border: none;
-    border-top: solid #453054;
+    border-top: solid #5c2d06;
     padding: 0 1;
-    background: #100b18;
+    background: #180e07;
 }
-#prompt:focus { border-top: solid #b980ee; }
+#prompt:focus { border-top: solid #ff8800; }
 #sidebar {
     width: 44;
-    border-left: solid #30213d;
+    border-left: solid #381a04;
     padding-left: 1;
     scrollbar-size: 1 1;
-    scrollbar-color: #6d438e;
-    scrollbar-background: #120d1c;
+    scrollbar-color: #994d00;
+    scrollbar-background: #1a0f05;
 }
 #mahakal { height: 21; min-height: 21; align: center middle; }
 #mahakal-image { width: auto; height: 18; }
@@ -61,17 +61,17 @@ Screen {
     min-height: 1;
     border: none;
     background: transparent;
-    color: #ddd0ea;
+    color: #f0dbcb;
     text-align: left;
     content-align: left middle;
     padding: 0;
 }
-#quick-commands Button:hover, #quick-commands Button:focus { background: #322044; color: #ead3ff; }
-#quick-commands Button:disabled { color: #73667f; }
-Footer { background: #21172e; color: #b6a4c7; }
-FooterKey { background: #21172e; }
-FooterKey .footer-key--key { background: #38234d; color: #e4c6ff; }
-FooterKey .footer-key--description { background: #21172e; color: #c9b4da; }
+#quick-commands Button:hover, #quick-commands Button:focus { background: #3d1e05; color: #ffbb66; }
+#quick-commands Button:disabled { color: #8c6850; }
+Footer { background: #291304; color: #d4b296; }
+FooterKey { background: #291304; }
+FooterKey .footer-key--key { background: #4d2204; color: #ffd299; }
+FooterKey .footer-key--description { background: #291304; color: #e0c2aa; }
 .narrow #sidebar { width: 100%; border-left: none; padding-left: 0; }
 .narrow #main-pane { padding-right: 0; }
 .short #overview { display: none; }

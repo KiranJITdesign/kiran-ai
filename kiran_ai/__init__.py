@@ -7,6 +7,12 @@ from importlib import import_module
 
 from kiran_ai.version import __version__
 
+try:
+    from kiran_ai.runtime.hardware import preload_windows_dlls
+    preload_windows_dlls()
+except Exception:
+    pass
+
 __author__ = "S Kiran"
 _EXPORTS = {
     'KiranAI': ('kiran_ai.runtime.engine', 'KiranAI'),

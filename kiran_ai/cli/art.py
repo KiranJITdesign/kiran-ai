@@ -22,18 +22,19 @@ _MAHAKAL_PATHS = [
 ]
 
 ASCII_CHARS = " .:-=+*#%@"
-PURPLE_PALETTE = [
-    "#201232",
-    "#341852",
-    "#4d1f7c",
-    "#6829a8",
-    "#8535d4",
-    "#a34ff4",
-    "#be73ff",
-    "#d59eff",
-    "#eac4ff",
+ORANGE_PALETTE = [
+    "#2b1404",
+    "#421e05",
+    "#662d05",
+    "#8f3e04",
+    "#b85002",
+    "#e06300",
+    "#ff7b00",
+    "#ffa033",
+    "#ffc480",
     "#ffffff",
 ]
+PURPLE_PALETTE = ORANGE_PALETTE
 
 
 def find_mahakal_path() -> Optional[Path]:
@@ -51,7 +52,7 @@ def find_mahakal_path() -> Optional[Path]:
 def get_mahakal_text(
     width: int = 14,
     height_lines: int = 5,
-    bg_hex: str = "#0c0912",
+    bg_hex: str = "#140c06",
     mode: str = "blocks",
 ) -> Text:
     """Render Mahakaal image as a Rich Text object with crisp high contrast.
@@ -224,24 +225,24 @@ def get_mahakal_braille(width: int = 16, height_lines: int = 6) -> Text:
 def get_mahakal_trinetra() -> Text:
     """Renders the sacred Tripundra (3 ash lines) with glowing Trinetra and crescent moon."""
     t = Text()
-    t.append("       🌙  ✦ MAHAKAAL ✦\n", style=Style(color="#eac4ff", bold=True))
-    t.append("  ════════════════════════════\n", style=Style(color="#a34ff4", bold=True))
+    t.append("       🌙  ✦ MAHAKAAL ✦\n", style=Style(color="#ffc480", bold=True))
+    t.append("  ════════════════════════════\n", style=Style(color="#ff7b00", bold=True))
     t.append("  ══════════ ( 👁 ) ══════════\n", style=Style(color="#ffffff", bold=True))
-    t.append("  ════════════════════════════\n", style=Style(color="#a34ff4", bold=True))
-    t.append("       OM NAMAH SHIVAYA", style=Style(color="#d59eff"))
+    t.append("  ════════════════════════════\n", style=Style(color="#ff7b00", bold=True))
+    t.append("       OM NAMAH SHIVAYA", style=Style(color="#ffa033"))
     return t
 
 
 def get_mahakal_trishul() -> Text:
     """Renders the sacred Mahatrisula & Damru (Cosmic Trident & Drum) in geometric Unicode."""
     t = Text()
-    t.append("          ▲\n", style=Style(color="#eac4ff", bold=True))
-    t.append("        \\ █ /\n", style=Style(color="#c17aff", bold=True))
+    t.append("          ▲\n", style=Style(color="#ffc480", bold=True))
+    t.append("        \\ █ /\n", style=Style(color="#ff7b00", bold=True))
     t.append("      ───(ॐ)───\n", style=Style(color="#ffffff", bold=True))
-    t.append("       /  █  \\\n", style=Style(color="#c17aff", bold=True))
-    t.append("         [⋈]   \n", style=Style(color="#eac4ff", bold=True))
-    t.append("          █    \n", style=Style(color="#a34ff4"))
-    t.append("          █    ", style=Style(color="#a34ff4"))
+    t.append("       /  █  \\\n", style=Style(color="#ff7b00", bold=True))
+    t.append("         [⋈]   \n", style=Style(color="#ffc480", bold=True))
+    t.append("          █    \n", style=Style(color="#e06300"))
+    t.append("          █    ", style=Style(color="#e06300"))
     return t
 
 
@@ -249,8 +250,8 @@ def get_mahakal_mantra() -> Text:
     """Renders the sacred Mahamrityunjaya Mantra in Sanskrit typography."""
     t = Text()
     t.append("ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम् ।\n", style=Style(color="#ffffff", bold=True))
-    t.append("उर्वारुकमिव बन्धनान्मृत्योर्मुक्षीय मामृतात् ॥\n\n", style=Style(color="#eac4ff", bold=True))
-    t.append("✦ MAHAKAAL · THE ETERNAL CONQUEROR OF TIME ✦", style=Style(color="#c17aff", bold=True))
+    t.append("उर्वारुकमिव बन्धनान्मृत्योर्मुक्षीय मामृतात् ॥\n\n", style=Style(color="#ffc480", bold=True))
+    t.append("✦ MAHAKAAL · THE ETERNAL CONQUEROR OF TIME ✦", style=Style(color="#ff7b00", bold=True))
     return t
 
 
@@ -266,7 +267,7 @@ def _fallback_text(width: int, height_lines: int) -> Text:
 def get_mahakal_panel(
     width: int = 64,
     height_lines: int = 16,
-    border_style: str = "#b77bea",
+    border_style: str = "#ff7700",
     mode: str = "blocks",
 ) -> Panel:
     """Creates a full-width Rich Panel enclosing Mahakaal artwork in the requested representation."""
@@ -279,12 +280,12 @@ def get_mahakal_panel(
     elif mode == "mantra":
         text = get_mahakal_mantra()
     else:
-        text = get_mahakal_text(width=width, height_lines=height_lines, bg_hex="#0c0911")
+        text = get_mahakal_text(width=width, height_lines=height_lines, bg_hex="#140c06")
 
     return Panel(
         text,
-        title="[bold #c17aff]✦ MAHAKAAL · DIVINE INSPIRATION ✦[/bold #c17aff]",
+        title="[bold #ff8800]✦ MAHAKAAL · DIVINE INSPIRATION ✦[/bold #ff8800]",
         border_style=border_style,
         padding=0,
-        style="on #0c0911",
+        style="on #140c06",
     )

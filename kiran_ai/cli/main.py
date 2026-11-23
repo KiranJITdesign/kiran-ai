@@ -29,7 +29,8 @@ from kiran_ai.dream.controller import (
 from kiran_ai.memory.hierarchy import EpisodicEntry, HierarchicalMemoryManager
 from kiran_ai.profile.creator import get_creator_profile
 from kiran_ai.runtime.chat import ChatEngine
-from kiran_ai.runtime.hardware import detect_hardware, is_google_colab, is_notebook_or_headless
+from kiran_ai.runtime.hardware import detect_hardware, is_google_colab, is_notebook_or_headless, preload_windows_dlls
+preload_windows_dlls()
 from kiran_ai.search.engine import SearchEngine
 from kiran_ai.memory.store import MemoryStore
 from kiran_ai.runtime.settings import load_settings, save_settings, settings_path
@@ -108,7 +109,7 @@ def cmd_info(*, emit=print) -> None:
 
 
 def cmd_setup(args: Optional[List[str] | str] = None, *, emit=print) -> None:
-    """Sets up the local GGUF inference engine automatically."""
+    """Sets up the local GGUF inference engine and default chat model automatically."""
     from kiran_ai.runtime.setup_engine import install_inference_engine
     force_cpu = False
     if args:
@@ -118,9 +119,22 @@ def cmd_setup(args: Optional[List[str] | str] = None, *, emit=print) -> None:
             force_cpu = any('--cpu' in str(a).lower() for a in args)
     install_inference_engine(force_cpu=force_cpu, emit=emit)
 
+    from kiran_ai.runtime.model_store import default_model_path, verify_model, download_model
+    from kiran_ai.runtime.local_model import bundled_model_path
+    if not bundled_model_path().is_file() and not default_model_path().is_file():
+        emit("✦ Downloading default local chat model (SmolLM2 135M, ~100 MB)...")
+        try:
+            p = download_model()
+            emit(f"✓ Chat model downloaded and verified: {p}")
+        except Exception as exc:
+            emit(f"⚠ Chat model download failed: {exc}")
+    else:
+        target = bundled_model_path() if bundled_model_path().is_file() else default_model_path()
+        emit(f"✓ Chat model is ready: {target}")
+
 
 def cmd_mahakal(args: Optional[List[str] | str] = None, *, emit=print) -> None:
-    """Render the sacred Mahakaal terminal graphic inside purple panel."""
+    """Render the sacred Mahakaal terminal graphic inside orange panel."""
     from kiran_ai.cli.art import get_mahakal_panel
     from rich.console import Console
 
@@ -883,6 +897,7 @@ def _auto_setup_engine(plain: bool = False) -> None:
 
 
 def main():
+    preload_windows_dlls()
     # Redirected Windows terminals can use legacy encodings that lack emoji.
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(errors='backslashreplace')

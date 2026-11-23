@@ -25,6 +25,8 @@ _INSTALL_LOCK = threading.Lock()
 def is_engine_installed() -> bool:
     """Return True if llama-cpp-python is importable and functional."""
     try:
+        from kiran_ai.runtime.hardware import preload_windows_dlls
+        preload_windows_dlls()
         import llama_cpp  # noqa: F401
         return True
     except (ImportError, OSError):

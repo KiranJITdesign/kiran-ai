@@ -38,6 +38,38 @@ class HardwareProfile:
 _CACHED_PROFILE: Optional[HardwareProfile] = None
 
 
+def preload_windows_dlls() -> None:
+    """On Windows, preload ggml and llama DLL dependencies in proper order.
+
+    Prevents access violation in llama_backend_init() caused by ctypes winmode /
+    dependency resolution in llama-cpp-python.
+    """
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        import importlib.util
+        spec = importlib.util.find_spec("llama_cpp")
+        if not spec or not spec.submodule_search_locations:
+            return
+        lib_dir = os.path.join(spec.submodule_search_locations[0], "lib")
+        if not os.path.isdir(lib_dir):
+            return
+        try:
+            os.add_dll_directory(lib_dir)
+        except Exception:
+            pass
+        for dll_name in ("ggml-base.dll", "ggml-cpu.dll", "ggml.dll", "llama.dll"):
+            dll_path = os.path.join(lib_dir, dll_name)
+            if os.path.isfile(dll_path):
+                try:
+                    ctypes.CDLL(dll_path)
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
+
 def detect_hardware(refresh: bool = False) -> HardwareProfile:
     """Detects available hardware accelerators with graceful fallback to CPU."""
     global _CACHED_PROFILE
@@ -98,6 +130,7 @@ def detect_hardware(refresh: bool = False) -> HardwareProfile:
 
     # 3. Try llama-cpp-python native GPU offload detection
     try:
+        preload_windows_dlls()
         import llama_cpp
         lib_dir = os.path.join(os.path.dirname(getattr(llama_cpp, "__file__", "")), "lib")
         has_gpu_backend = os.path.isdir(lib_dir) and any(

@@ -19,13 +19,15 @@ from kiran_ai.cli.art import get_mahakal_braille, get_mahakal_text
 from kiran_ai.cli.command_prompts import CommandPrompt, missing_input_prompt
 from kiran_ai.cli.confidence import confidence_lines
 from kiran_ai.profile.creator import get_creator_profile
+from kiran_ai.runtime.hardware import preload_windows_dlls
 from kiran_ai.runtime.session_status import SessionStatus
 from kiran_ai.version import __version__
 
-PURPLE = '#c17aff'
-DIM = '#93889f'
+ORANGE = '#ff7700'
+PURPLE = ORANGE
+DIM = '#b39a88'
 GREEN = '#6de894'
-AMBER = '#e9be75'
+AMBER = '#ffaa33'
 
 # Terminal control characters must never be executable output. Rich Text also
 # prevents prompts and generated text from becoming styling or link markup.
@@ -55,7 +57,7 @@ def duration(seconds: float) -> str:
 class Brand(Static):
     def render(self):
         if self.app.size.width < 75 or self.app.size.height < 32:
-            return Text.assemble(('KiranAI', f'bold {PURPLE}'),
+            return Text.assemble(('KiranAI', f'bold {ORANGE}'),
                                  (f'  v{__version__}\n', DIM),
                                  ('Local AI · Created by S Kiran', DIM))
         logo = [
@@ -67,7 +69,7 @@ class Brand(Static):
             '╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝',
         ]
         text = Text(justify='center')
-        for line, color in zip(logo, ['#d7adff', '#c68cff', '#b56cf4', '#a25ce0', '#9150c9', '#7d43b1']):
+        for line, color in zip(logo, ['#ffe0b2', '#ffcc80', '#ffa726', '#ff9100', '#ff6d00', '#e65100']):
             text.append(line + '\n', color)
         text.append(f'KiranAI v{__version__}  ·  Local AI, your terminal\n', 'bold')
         text.append('Chat  |  Code  |  Memory  |  Research\n', DIM)
@@ -98,7 +100,7 @@ class ChatTurn(Vertical):
             yield self.note
 
     def _body_text(self) -> Text:
-        return Text.assemble(('KiranAI ✦ :  ', f'bold {PURPLE}'), (safe_text(self.content), ''))
+        return Text.assemble(('KiranAI ✦ :  ', f'bold {ORANGE}'), (safe_text(self.content), ''))
 
     def append(self, piece: str) -> None:
         self.content += piece
@@ -121,7 +123,7 @@ class CreatorCard(Static):
                     ('About', profile.professional_identity),
                     ('Inspiration', profile.spiritual_inspiration),
                     ('Motto', profile.personal_motto), ('GitHub', profile.github_url))
-        mahakal_art = get_mahakal_text(width=18, height_lines=8, bg_hex='#0c0912')
+        mahakal_art = get_mahakal_text(width=18, height_lines=8, bg_hex='#140c06')
         card = Table.grid(padding=(0, 2), expand=False)
         card.add_column()
         card.add_column()
@@ -230,6 +232,7 @@ class KiranDashboard(App):
         yield Footer()
 
     def on_mount(self) -> None:
+        preload_windows_dlls()
         self.theme = 'textual-dark'
         self.query_one('#quick-commands').border_title = '⌁ Quick Commands'
         self.refresh_panels()
@@ -462,6 +465,20 @@ class KiranDashboard(App):
                     self.post_message(TaskFinished(cancelled=False, error='Engine not installed', notes=[], creator=False))
                     return
                 emit('\n✓ Engine ready! Answering your question now...\n\n')
+            # --- Auto-model guard --------------------------------------------
+            from kiran_ai.runtime.local_model import bundled_model_path
+            from kiran_ai.runtime.model_store import default_model_path, download_model
+            chat_engine = self.engine_getter()
+            if chat_engine.settings.backend == 'local':
+                configured = Path(chat_engine.settings.model_file) if chat_engine.settings.model_file else None
+                if not (configured and configured.is_file()) and not bundled_model_path().is_file() and not default_model_path().is_file():
+                    emit = lambda piece: self.post_message(ReplyPiece(piece + '\n' if not piece.endswith('\n') else piece))
+                    emit('✦ Downloading KiranAI chat model (SmolLM2 135M, ~100 MB)...\n')
+                    try:
+                        download_model(default_model_path())
+                        emit('✓ Model ready! Answering your question now...\n\n')
+                    except Exception as dl_err:
+                        emit(f'\n⚠ Could not download model automatically: {dl_err}\n')
             # -----------------------------------------------------------------
             command, _, argument = text.partition(' ')
             command = command.lower()
