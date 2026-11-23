@@ -68,7 +68,7 @@ from __future__ import annotations
 import math
 import zlib
 from dataclasses import dataclass, field
-from typing import Sequence
+from typing import Any, Sequence, Union
 
 import torch
 import torch.nn as nn
@@ -171,7 +171,7 @@ class Score:
             raise ValueError(f"Score needs >= 2 levels, got {len(self.labels)}")
 
 
-Question = Noul | Choice | Score
+Question = Union[Noul, Choice, Score]
 
 
 @dataclass(frozen=True)
@@ -196,7 +196,7 @@ class ScoreAnswer:
     confidence: float
 
 
-Answer = NoulAnswer | ChoiceAnswer | ScoreAnswer
+Answer = Union[NoulAnswer, ChoiceAnswer, ScoreAnswer]
 
 
 # A real deployment uses a proper BPE tokenizer. This hash tokenizer exists so
@@ -236,7 +236,7 @@ class HashTokenizer:
         return ids, ids.eq(self.PAD)
 
 
-StateValue = str | int | float | bool | None | dict | list
+StateValue = Union[str, int, float, bool, None, dict, list]
 
 
 def flatten_state(

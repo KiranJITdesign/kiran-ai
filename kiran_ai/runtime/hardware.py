@@ -99,18 +99,27 @@ def detect_hardware(refresh: bool = False) -> HardwareProfile:
     # 3. Try llama-cpp-python native GPU offload detection
     try:
         import llama_cpp
-        if hasattr(llama_cpp, "llama_supports_gpu_offload") and llama_cpp.llama_supports_gpu_offload():
-            profile = HardwareProfile(
-                device_type="gpu_offload",
-                device_name="Hardware GPU (llama-cpp accelerated)",
-                gpu_available=True,
-                n_gpu_layers=-1,
-                cpu_cores=cpu_cores,
-                optimal_threads=optimal_threads,
-            )
-            _CACHED_PROFILE = profile
-            return profile
-    except Exception:
+        lib_dir = os.path.join(os.path.dirname(getattr(llama_cpp, "__file__", "")), "lib")
+        has_gpu_backend = os.path.isdir(lib_dir) and any(
+            any(x in f.lower() for x in ("cuda", "vulkan", "metal", "kompute", "directml", "sycl"))
+            for f in os.listdir(lib_dir)
+        )
+        if has_gpu_backend and hasattr(llama_cpp, "llama_supports_gpu_offload"):
+            try:
+                if llama_cpp.llama_supports_gpu_offload():
+                    profile = HardwareProfile(
+                        device_type="gpu_offload",
+                        device_name="Hardware GPU (llama-cpp accelerated)",
+                        gpu_available=True,
+                        n_gpu_layers=-1,
+                        cpu_cores=cpu_cores,
+                        optimal_threads=optimal_threads,
+                    )
+                    _CACHED_PROFILE = profile
+                    return profile
+            except (OSError, Exception):
+                pass
+    except (OSError, Exception):
         pass
 
     # Fallback: CPU
