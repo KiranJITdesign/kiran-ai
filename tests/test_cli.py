@@ -9,7 +9,7 @@ import unittest
 from unittest.mock import patch
 
 
-class TestHariCLI(unittest.TestCase):
+class TestKiranCLI(unittest.TestCase):
     def test_interactive_launch_defaults_to_dashboard(self):
         cli = importlib.import_module('kiran_ai.cli.main')
         with patch.object(cli.sys.stdin, 'isatty', return_value=True), \

@@ -104,11 +104,11 @@ def main():
             print(f'{step+1}/{args.steps} loss={loss.item():.4f}', flush=True)
     final = evaluate()
     print('After:', final, flush=True)
-    torch.save({'config': config, 'model_state_dict': model.state_dict(), 'step': args.steps}, output / 'hari_student.pt')
+    torch.save({'config': config, 'model_state_dict': model.state_dict(), 'step': args.steps}, output / 'kiran_student.pt')
     quantize_model(model, precision='int4')
     quantized_result = evaluate()
     print('After quantization:', quantized_result, flush=True)
-    export = save_quantized_checkpoint(model, str(output / 'hari_student_int4.pt'), max_size_mb=35_000_000 / (1024 * 1024))
+    export = save_quantized_checkpoint(model, str(output / 'kiran_student_int4.pt'), max_size_mb=35_000_000 / (1024 * 1024))
     (output / 'report.json').write_text(json.dumps({'seed': args.seed, 'steps': args.steps,
         'teacher_source': args.teacher, 'teacher_verified_train': len(teacher_train),
         'teacher_verified_eval': len(teacher_eval), 'oracle_train_examples': len(train)-len(teacher_train)*4,

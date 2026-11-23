@@ -944,7 +944,7 @@ def main():
             except (OSError, RuntimeError, ValueError) as exc:
                 print(f'{cmd}: {exc}')
     elif cmd in ["help", "-h", "--help"]:
-        print("Usage: hari [run|ask|think|decide|setup|code|memory|dream|settings|status|info|version|help]")
+        print("Usage: kiran [run|ask|think|decide|setup|code|memory|dream|settings|status|info|version|help]")
         print('Interactive launch opens the live dashboard. Use `kiran run --plain` for line-based chat.')
         print('Use `kiran setup` to automatically install the prebuilt local GGUF engine.')
     else:

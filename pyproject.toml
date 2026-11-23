@@ -47,7 +47,6 @@ ocr = [
 
 [project.scripts]
 kiran = "kiran_ai.cli.main:main"
-hari = "kiran_ai.cli.main:main"
 
 [tool.setuptools.packages.find]
 include = ["kiran_ai*"]

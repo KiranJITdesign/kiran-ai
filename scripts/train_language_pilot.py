@@ -105,10 +105,10 @@ def main():
     after = evaluate()
     print(f'Trained held-out loss: {after:.4f}', flush=True)
     torch.save({'config': config, 'model_state_dict': model.state_dict(), 'step': args.steps},
-               args.output / 'hari_language_fp32.pt')
+               args.output / 'kiran_language_fp32.pt')
     quantize_model(model, precision='int4')
     quantized_loss = evaluate()
-    export = save_quantized_checkpoint(model, str(args.output / 'hari_language_int4.pt'),
+    export = save_quantized_checkpoint(model, str(args.output / 'kiran_language_int4.pt'),
         max_size_mb=35_000_000 / (1024 * 1024))
     sources = sorted({str(row.get('source') or 'unspecified') for row in rows})
     report = {'purpose': 'language pretraining pilot; not an instruction-tuned assistant',

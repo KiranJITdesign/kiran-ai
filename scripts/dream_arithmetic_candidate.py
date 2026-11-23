@@ -37,7 +37,7 @@ def checked(record):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--base', type=Path, default=Path('checkpoints/arithmetic_student_long_v1/hari_student.pt'))
+    p.add_argument('--base', type=Path, default=Path('checkpoints/arithmetic_student_long_v1/kiran_student.pt'))
     p.add_argument('--teachers', type=Path, nargs='+', default=[Path('data/qwen_teacher_arithmetic_v1.jsonl'), Path('data/smollm_dream_arithmetic_v1.jsonl')])
     p.add_argument('--language-data', type=Path, default=Path('data/fineweb_pilot.jsonl'))
     p.add_argument('--output', type=Path, default=Path('checkpoints/dream_candidate_v1'))

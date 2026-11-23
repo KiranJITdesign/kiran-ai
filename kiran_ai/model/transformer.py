@@ -295,5 +295,5 @@ class KiranNanoModel(nn.Module):
 
 
 # Backwards compatibility alias
-HariTransformerBlock = UAIATransformerBlock
+KiranTransformerBlock = UAIATransformerBlock
 UAIANanoModel = KiranNanoModel

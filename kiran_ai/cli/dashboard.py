@@ -190,7 +190,7 @@ class KiranDashboard(App):
     def compose(self) -> ComposeResult:
         with Horizontal(id='titlebar'):
             yield Static(Text.assemble(('● ', '#ff6a80'), ('● ', '#f3c762'), ('●', '#65d892')), id='lights')
-            yield Static('hari — KiranAI Terminal', id='window-title', markup=False)
+            yield Static('KiranAI Terminal', id='window-title', markup=False)
             yield Static(f'v{__version__}', id='version', markup=False)
         with Horizontal(id='workspace'):
             with Vertical(id='main-pane'):

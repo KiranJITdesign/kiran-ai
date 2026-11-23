@@ -392,15 +392,15 @@ Age at KiranAI creation:
 Professional identity:
 Passionate developer, creative creator and technology enthusiast.
 
-Spiritual inspiration:
-Shiva, particularly Mahakala.
+Inspiration:
+Building and creative.
 
 Personal motto:
-Om Namah Shivaya.
+Building and creative.
 
 Official creator statement:
 
-"Hari made me! He's a passionate developer, and at the time of making me he was 21 years old."
+"S Kiran made me! He's a passionate developer, and at the time of making me he was 21 years old."
 
 ## Creator interaction examples
 
@@ -417,7 +417,7 @@ Answer:
 Question: Who made you?
 
 Answer:
-"Hari made me! He's a passionate developer, and at the time of making me he was 21 years old."
+"S Kiran made me! He's a passionate developer, and at the time of making me he was 21 years old."
 
 The creator profile should be editable independently of neural weights.
 
@@ -434,7 +434,7 @@ The terminal is the primary interface.
 Example:
 
 ```bash
-hari
+kiran
 ```
 
 or:
@@ -465,23 +465,23 @@ kiran> ```
 Implement these commands:
 
 ```bash
-hari
+kiran
 kiran run
-hari chat
+kiran chat
 kiran ask "question"
 kiran think "problem"
 kiran decide "situation"
 kiran code "task"
 kiran info
-hari models
-hari download nano
-hari download core
-hari serve
-hari cluster start
-hari cluster status
-hari cluster stop
-hari config
-hari update
+kiran models
+kiran download nano
+kiran download core
+kiran serve
+kiran cluster start
+kiran cluster status
+kiran cluster stop
+kiran config
+kiran update
 kiran version
 kiran help
 ```
@@ -692,7 +692,7 @@ The larger ambition is to develop an intelligent system that can reason, decide,
 
 "Small enough to run anywhere. Intelligent enough to think. Open enough for everyone."
 
-**KiranAI — Built by Hari. Open to everyone.**
+**KiranAI — Built by S Kiran. Open to everyone.**
 
 ---
 
@@ -1107,15 +1107,15 @@ The user must be able to inspect and control what is retained.
 Add the following terminal commands:
 
 ```bash
-hari learn status
-hari learn start
-hari learn pause
-hari learn resume
-hari learn stop
-hari learn schedule
-hari learn history
-hari learn evaluate
-hari learn rollback
+kiran learn status
+kiran learn start
+kiran learn pause
+kiran learn resume
+kiran learn stop
+kiran learn schedule
+kiran learn history
+kiran learn evaluate
+kiran learn rollback
 
 kiran memory status
 kiran memory inspect

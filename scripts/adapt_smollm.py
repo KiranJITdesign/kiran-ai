@@ -74,7 +74,7 @@ def loss_on(model, data):
 def probe(path):
     llm = Llama(model_path=str(path), n_ctx=2048, n_threads=4, verbose=False, chat_format='chatml', seed=42)
     results = []
-    identity_targets = [('kiranai',), ('k r hari prajwal',), ('k r hari prajwal',), ('kiranai',)]
+    identity_targets = [('kiranai',), ('s kiran',), ('s kiran',), ('kiranai',)]
     for question, wanted in list(zip(IDENTITY_PROBE, identity_targets)) + GENERAL_PROBE:
         output = llm.create_chat_completion(messages=[{'role': 'system', 'content': SYSTEM},
             {'role': 'user', 'content': question}], max_tokens=120, temperature=0)['choices'][0]['message']['content']

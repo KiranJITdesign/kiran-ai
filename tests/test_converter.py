@@ -15,18 +15,18 @@ class TestDocumentConverter(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_same_name_rule(self):
-        src = self.dir / "hari.pdf"
-        src.write_text("Hello from Hari", encoding="utf-8")
+        src = self.dir / "kiran.pdf"
+        src.write_text("Hello from Kiran", encoding="utf-8")
 
         # Convert to docx without output_path
         out = convert_document(src, "docx")
-        self.assertEqual(out.name, "hari.docx")
+        self.assertEqual(out.name, "kiran.docx")
         self.assertTrue(out.is_file())
         self.assertEqual(out.parent, src.parent)
 
         # Convert to txt
         out_txt = convert_document(out, "txt")
-        self.assertEqual(out_txt.name, "hari.txt")
+        self.assertEqual(out_txt.name, "kiran.txt")
         self.assertTrue(out_txt.is_file())
 
     def test_markdown_to_docx_roundtrip(self):
@@ -59,7 +59,7 @@ class TestDocumentConverter(unittest.TestCase):
 
     def test_csv_and_json_conversions(self):
         csv_file = self.dir / "data.csv"
-        csv_file.write_text("Name,Role,Status\nHari,Creator,Active\nBot,Swarm,Running\n", encoding="utf-8")
+        csv_file.write_text("Name,Role,Status\nKiran,Creator,Active\nBot,Swarm,Running\n", encoding="utf-8")
 
         # CSV to HTML
         html_file = convert_document(csv_file, "html")
@@ -69,7 +69,7 @@ class TestDocumentConverter(unittest.TestCase):
         # CSV to JSON
         json_file = convert_document(csv_file, "json")
         self.assertEqual(json_file.name, "data.json")
-        self.assertIn("Hari", json_file.read_text(encoding="utf-8"))
+        self.assertIn("Kiran", json_file.read_text(encoding="utf-8"))
 
     def test_custom_output_destination(self):
         src = self.dir / "input.txt"

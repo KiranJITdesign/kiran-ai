@@ -90,7 +90,7 @@ class MultiKiranSwarm:
             worker_names = ", ".join(p.name for p in self.personas)
             return {
                 "active": True,
-                "session": "Multi-Hari Swarm",
+                "session": "Multi-KiranAI Swarm",
                 "workers": f"{self.workers_count} active ({worker_names})",
                 "activity": self.activity,
                 "mode": "Multi-Agent Consensus",
@@ -98,7 +98,7 @@ class MultiKiranSwarm:
         elif self.dialogue_history:
             return {
                 "active": False,
-                "session": "Multi-Hari Swarm",
+                "session": "Multi-KiranAI Swarm",
                 "workers": f"{self.workers_count} stand-by",
                 "activity": "Consensus reached",
                 "mode": "Multi-Agent Cluster",

@@ -50,7 +50,7 @@ class LanguagePilotTests(unittest.TestCase):
             self.assertEqual(report['training_tokens_processed'], 64)
             self.assertGreater(report['training_seconds'], 0)
             self.assertGreater(report['training_tokens_per_second'], 0)
-            self.assertLess((output / 'hari_language_int4.pt').stat().st_size, 35_000_000)
+            self.assertLess((output / 'kiran_language_int4.pt').stat().st_size, 35_000_000)
             self.assertGreater(report['quantized_eval_loss_nats'], 0)
 
 

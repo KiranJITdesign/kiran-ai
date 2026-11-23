@@ -15,7 +15,7 @@ Tags:
 Installers:
   - Architecture: x64
     InstallerType: portable
-    InstallerUrl: https://github.com/skiran/KiranAI/releases/download/v0.1.0/hari-win64.zip
+    InstallerUrl: https://github.com/skiran/KiranAI/releases/download/v0.1.0/kiran-win64.zip
 ManifestType: singleton
 ManifestVersion: 1.4.0
 

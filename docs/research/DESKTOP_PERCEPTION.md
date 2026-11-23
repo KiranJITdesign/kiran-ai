@@ -45,8 +45,7 @@ and OCR does not authorize a click or establish task completion. A local vision
 model and a user-selected screen region are still required for autonomous
 actions.
 
-## Dashboard image rendering
+## Dashboard rendering
 
-The Mahakaal artwork is static, so the dashboard uses high-density coloured
-Braille rendering. Avoiding terminal graphics protocols keeps the live panel
-renderer stable while retaining more detail than enlarged half-cell blocks.
+Avoiding terminal graphics protocols keeps the live panel
+renderer stable while retaining fast and consistent performance.

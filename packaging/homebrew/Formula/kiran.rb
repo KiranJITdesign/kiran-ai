@@ -1,4 +1,4 @@
-class Hari < Formula
+class Kiran < Formula
   desc "KiranAI: Original, open-weight AI system under 50 MB"
   homepage "https://github.com/skiran"
   url "https://github.com/skiran/KiranAI/archive/refs/tags/v0.1.0.tar.gz"
@@ -11,7 +11,7 @@ class Hari < Formula
   end
 
   test do
-    system "#{bin}/hari", "version"
+    system "#{bin}/kiran", "version"
   end
 end
 

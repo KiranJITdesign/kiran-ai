@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from rich.table import Table
 from rich.text import Text
 from textual.widgets import Button, Input, Static
 
@@ -101,14 +102,10 @@ class TestKiranDashboard(unittest.IsolatedAsyncioTestCase):
         async with self.app.run_test(size=(160, 54)) as pilot:
             self.assertTrue(self.app.query_one('#sidebar').display)
             self.assertTrue(self.app.query_one('#main-pane').display)
-            self.assertEqual(len(self.app.query('#sidebar .panel')), 6)
-            image = self.app.query_one('#mahakal-image')
-            self.assertIsInstance(image, Static)
-            self.assertEqual(image.region.height, 18)
+            self.assertEqual(len(self.app.query('#sidebar .panel')), 5)
             self.assertEqual([panel.id for panel in self.app.query('#sidebar .panel')], [
-                'runtime-status', 'capabilities', 'learning', 'cluster', 'mahakal', 'quick-commands',
+                'runtime-status', 'capabilities', 'learning', 'cluster', 'quick-commands',
             ])
-            self.assertEqual(image.content.plain.count('\n'), 17)
             rendered = self.app.export_screenshot()
             self.assertEqual(rendered.count('Capabilities'), 1)
             self.assertEqual(rendered.count('Ready'), 1)
@@ -306,6 +303,11 @@ class TestKiranDashboard(unittest.IsolatedAsyncioTestCase):
     async def test_silent_command_switches_mode(self):
         await self.app.submit_prompt('/silent')
         self.assertTrue(self.app.switch_to_silent)
+
+    def test_creator_card_renders(self):
+        card = CreatorCard()
+        rendered = card.render()
+        self.assertIsInstance(rendered, Table)
 
 
 if __name__ == '__main__':

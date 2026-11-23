@@ -329,7 +329,7 @@ class TestDesktopImports(unittest.TestCase):
     def test_module_import_does_not_load_desktop_dependencies(self):
         # Executing a fresh module avoids invalidating the classes imported above.
         spec = importlib.util.find_spec("kiran_ai.agent.desktop")
-        fresh = types.ModuleType("_hari_desktop_import_test")
+        fresh = types.ModuleType("_kiran_desktop_import_test")
         import sys
         with patch.dict(sys.modules, {fresh.__name__: fresh}), \
                 patch.object(importlib, "import_module", side_effect=AssertionError("eager dependency")):

@@ -11,6 +11,10 @@ class TestCreatorProfile(unittest.TestCase):
         self.assertEqual(profile.github_url, "https://github.com/skiran")
         self.assertEqual(profile.origin_region, "Karnataka, India")
         self.assertEqual(profile.creation_age, 21)
+        self.assertEqual(profile.spiritual_inspiration, "Building and creative")
+        self.assertEqual(profile.personal_motto, "Building and creative")
+        self.assertEqual(profile.inspiration, "Building and creative")
+        self.assertEqual(profile.motto, "Building and creative")
 
     def test_canonical_identity_questions(self):
         profile = get_creator_profile()
@@ -38,6 +42,18 @@ class TestCreatorProfile(unittest.TestCase):
             resp_contact,
             "You can contact my creator, S Kiran, through his GitHub profile: "
             "https://github.com/skiran",
+        )
+
+        resp_insp = profile.answer_identity_question("What is your inspiration?")
+        self.assertEqual(
+            resp_insp,
+            "Kiran draws inspiration from Building and creative.",
+        )
+
+        resp_motto = profile.answer_identity_question("What is your motto?")
+        self.assertEqual(
+            resp_motto,
+            "Kiran's personal motto is 'Building and creative'.",
         )
 
     def test_short_direct_identity_questions_and_capabilities(self):

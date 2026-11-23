@@ -77,7 +77,6 @@ KiranAI provides a keyboard- and mouse-friendly dual-pane terminal interface bui
 - **Active Capability Indicators**: Displays automatic training, autonomous tool execution, web search, and local memory status.
 - **Streaming Inference**: Real-time token generation with token probability and arithmetic checks.
 - **Multi-KiranAI Cluster**: Swarm debate and consensus engine using `/swarm <topic>`.
-- **Mahakaal Artwork**: Unicode Braille, Trinetra, and Trishul artwork.
 - **Quick Commands**: `/status`, `/convert`, `/tools`, `/auto`, `/takeover`, `/swarm`, `/dream`, and `/settings`.
 
 ### Keyboard Shortcuts
@@ -184,24 +183,6 @@ kiran dream auto on
 kiran dream auto off
 ```
 
-### 5. Sacred Mahakaal Artwork
-
-Render Mahakaal artwork directly in the terminal.
-
-```bash
-kiran mahakal braille
-kiran mahakal trinetra
-kiran mahakal trishul
-kiran mahakal text
-```
-
-Available styles:
-
-- **Braille**: High-density Unicode representation with crescent moon.
-- **Trinetra**: Third Eye and Tripundra representation.
-- **Trishul**: Trishul and Damru representation.
-- **Text**: 256-color purple ANSI block representation.
-
 ---
 
 ## CLI Command Reference
@@ -216,7 +197,6 @@ Available styles:
 | `kiran tools` | `kiran tools run "<task>"` | Autonomous tool execution |
 | `kiran mcp` | `kiran mcp [list\|add\|connect]` | Manage MCP servers |
 | `kiran swarm` | `kiran swarm "<topic>"` | Multi-agent debate and consensus |
-| `kiran mahakal` | `kiran mahakal [style]` | Render Mahakaal artwork |
 | `kiran status` | `kiran status` | Display system status |
 | `kiran memory` | `kiran memory [add\|inspect\|delete]` | Manage local memory |
 | `kiran settings` | `kiran settings show` | View settings |

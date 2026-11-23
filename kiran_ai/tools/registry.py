@@ -54,7 +54,7 @@ class ToolRegistry:
                     "properties": {
                         "source": {
                             "type": "string",
-                            "description": "Path to the input document file to convert (e.g. 'hari.pdf').",
+                            "description": "Path to the input document file to convert (e.g. 'document.pdf').",
                         },
                         "target_format": {
                             "type": "string",

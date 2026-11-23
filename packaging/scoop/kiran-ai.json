@@ -5,15 +5,15 @@
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/skiran/KiranAI/releases/download/v0.1.0/hari-win64.zip",
-            "bin": "hari.exe"
+            "url": "https://github.com/skiran/KiranAI/releases/download/v0.1.0/kiran-win64.zip",
+            "bin": "kiran.exe"
         }
     },
     "checkver": "github",
     "autoupdate": {
         "architecture": {
             "64bit": {
-                "url": "https://github.com/skiran/KiranAI/releases/download/v$version/hari-win64.zip"
+                "url": "https://github.com/skiran/KiranAI/releases/download/v$version/kiran-win64.zip"
             }
         }
     }

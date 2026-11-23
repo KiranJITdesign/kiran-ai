@@ -15,7 +15,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--endpoint', default='http://127.0.0.1:11526')
-    parser.add_argument('--model', default='hari-teacher-qwen')
+    parser.add_argument('--model', default='kiran-teacher-qwen')
     parser.add_argument('--output', default='data/teacher_arithmetic.jsonl')
     parser.add_argument('--count', type=int, default=32)
     parser.add_argument('--seed', type=int, default=20261107)

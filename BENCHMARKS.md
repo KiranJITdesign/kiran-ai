@@ -35,7 +35,7 @@ reasoning or an authorization mechanism. Its confidence head is untrained.
 Example (choose a new output file for every run):
 
 ```powershell
-python benchmarks/evaluate_checkpoint.py checkpoints/arithmetic_student_long_v1/hari_student_int4.pt --output checkpoints/arithmetic_student_long_v1/probe2.json
+python benchmarks/evaluate_checkpoint.py checkpoints/arithmetic_student_long_v1/kiran_student_int4.pt --output checkpoints/arithmetic_student_long_v1/probe2.json
 ```
 
 Before claiming broader progress, evaluate independently held-out language,

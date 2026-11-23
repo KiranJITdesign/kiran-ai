@@ -6,7 +6,7 @@ _EXPORTS = {
     **{name: ('kiran_ai.model.layers', name) for name in
        ('RMSNorm', 'RotaryEmbedding', 'GroupedQueryAttention', 'SwiGLU', 'apply_rotary_emb')},
     **{name: ('kiran_ai.model.transformer', name) for name in
-       ('StructuredDecisionHead', 'HariTransformerBlock', 'UAIATransformerBlock',
+       ('StructuredDecisionHead', 'KiranTransformerBlock', 'UAIATransformerBlock',
         'KiranNanoModel', 'UAIANanoModel')},
 }
 __all__ = list(_EXPORTS)

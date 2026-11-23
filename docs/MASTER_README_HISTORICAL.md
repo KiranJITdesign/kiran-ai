@@ -153,7 +153,7 @@ flowchart LR
 When executing `kiran think "<problem>"`, the engine generates internal reasoning tokens within `<|thought|>` delimiters before presenting the conclusion:
 
 ```text
-PS D:\downloads\KiranAI> .\hari.ps1 think "Solve tower of hanoi with 3 pegs"
+PS D:\downloads\KiranAI> .\kiran.ps1 think "Solve tower of hanoi with 3 pegs"
 
 <|thought|>
 Decomposing problem: 'Solve tower of hanoi with 3 pegs'
@@ -250,10 +250,10 @@ Launch the interactive REPL immediately using the built-in launchers:
 
 ```powershell
 # Using PowerShell launcher:
-.\hari.ps1
+.\kiran.ps1
 
 # Or using Windows Batch launcher:
-.\hari.bat
+.\kiran.bat
 ```
 
 You are greeted by the clean, vanishing-placeholder prompt:
@@ -281,7 +281,7 @@ KiranAI provides a unified, terminal-first CLI for both direct execution and con
 
 ```bash
 # General syntax:
-hari <subcommand> [arguments...]
+kiran <subcommand> [arguments...]
 ```
 
 ### Complete Subcommand Index
@@ -516,8 +516,8 @@ KiranAI/
 ├── checkpoints/                    # Saved Neural Weights (kiran_ai_nano.pt, INT4)
 ├── docs/                           # Architectural Blueprints & Research Papers
 ├── scripts/                        # Scratch Training & Compression Scripts
-├── hari.bat                        # Windows 1-Click Batch Launcher
-├── hari.ps1                        # Windows 1-Click PowerShell Launcher
+├── kiran.bat                       # Windows 1-Click Batch Launcher
+├── kiran.ps1                       # Windows 1-Click PowerShell Launcher
 ├── pyproject.toml                  # Standard Python Packaging Configuration
 └── README.md                       # Master Documentation
 ```
@@ -535,7 +535,7 @@ KiranAI is an independent, original research project designed, implemented, and 
 | **Creator & Founder** | **S Kiran** |
 | **Origin Region** | Karnataka, India |
 | **Age at Creation** | $21$ years old |
-| **Official Statement** | *"Hari made me! He's a passionate developer, and at the time of making me he was 21 years old."* |
+| **Official Statement** | *"S Kiran created KiranAI. He started building it when he was 21 years old."* |
 | **GitHub** | [`https://github.com/skiran`](https://github.com/skiran) |
 | **Primary Research Mission** | *Democratizing high-density neural intelligence within a strict 45 MB footprint.* |
 
