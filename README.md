@@ -19,8 +19,11 @@ It provides conversational inference, autonomous desktop control, multi-format d
 ##Demo
 
 '''
-<img width="1713" height="932" alt="Screenshot 2026-11-23 204559" src="https://github.com/user-attachments/assets/33ade71d-ef03-49a6-aa75-b39ec172c467" />
-<img width="1706" height="922" alt="Screenshot 2026-11-23 204631" src="https://github.com/user-attachments/assets/ba4a9ae1-8419-4500-b6ce-8b2eb6448177" />
+<img width="1692" height="936" alt="Screenshot 2026-11-23 214324" src="https://github.com/user-attachments/assets/0fcad4b6-0209-4041-858d-67eac14e3a5e" />
+
+
+<img width="1692" height="947" alt="Screenshot 2026-11-23 214308" src="https://github.com/user-attachments/assets/e14c905b-34f8-4526-98ca-65223ac96f2b" />
+
 
 
 '''
@@ -295,5 +298,6 @@ Additional information:
 - [DATA_LICENSES.md](DATA_LICENSES.md)
 
 For bugs, questions, and feature proposals, visit [GitHub Issues](https://github.com/skiran/KiranAI/issues).
+
 
 
