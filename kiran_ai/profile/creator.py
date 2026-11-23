@@ -22,11 +22,19 @@ class CreatorProfile:
     professional_identity: str = (
         "Passionate developer, creative creator and technology enthusiast."
     )
-    spiritual_inspiration: str = "Shiva, particularly Mahakala"
-    personal_motto: str = "Om Namah Shivaya"
+    spiritual_inspiration: str = "Building and creative"
+    personal_motto: str = "Building and creative"
     official_statement: str = (
         "S Kiran created KiranAI. He started building it when he was 21 years old."
     )
+
+    @property
+    def inspiration(self) -> str:
+        return self.spiritual_inspiration
+
+    @property
+    def motto(self) -> str:
+        return self.personal_motto
 
     def answer_identity_question(self, query: str) -> Optional[str]:
         """Provides canonical creator answers for standard identity inquiries.
@@ -65,9 +73,13 @@ class CreatorProfile:
                 f"{self.github_url}"
             )
 
-        if "easter egg" in q or "inspiration" in q or "shiva" in q or "motto" in q:
+        if "easter egg" in q or "inspiration" in q or "motto" in q:
+            if "motto" in q and "inspiration" not in q:
+                return f"Kiran's personal motto is '{self.personal_motto}'."
+            if "inspiration" in q and "motto" not in q:
+                return f"Kiran draws inspiration from {self.spiritual_inspiration}."
             return (
-                f"Kiran draws deep spiritual inspiration from {self.spiritual_inspiration}, "
+                f"Kiran draws inspiration from {self.spiritual_inspiration}, "
                 f"guided by the personal motto '{self.personal_motto}'."
             )
 

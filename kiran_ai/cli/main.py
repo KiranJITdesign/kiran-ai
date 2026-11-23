@@ -133,22 +133,6 @@ def cmd_setup(args: Optional[List[str] | str] = None, *, emit=print) -> None:
         emit(f"✓ Chat model is ready: {target}")
 
 
-def cmd_mahakal(args: Optional[List[str] | str] = None, *, emit=print) -> None:
-    """Render the sacred Mahakaal terminal graphic inside orange panel."""
-    from kiran_ai.cli.art import get_mahakal_panel
-    from rich.console import Console
-
-    mode = "blocks"
-    if args:
-        raw_mode = (args[0] if isinstance(args, list) else str(args)).lower().strip()
-        if raw_mode in ("braille", "trinetra", "trishul", "mantra", "blocks"):
-            mode = raw_mode
-
-    console = Console(color_system="truecolor", force_terminal=True)
-    panel = get_mahakal_panel(width=72, height_lines=14, mode=mode)
-    console.print(panel)
-
-
 def cmd_version(*, emit=print) -> None:
     emit(f"KiranAI version {__version__} (standalone local GGUF)")
 
@@ -656,8 +640,6 @@ def repl() -> None:
         elif lower in ["clear", "/clear"]:
             _CHAT_ENGINE.clear_history()
             print("Conversation history reset. Ready for a new topic!\n")
-        elif lower in ["mahakal", "/mahakal", "shiva", "/shiva"]:
-            cmd_mahakal()
         elif lower in ["info", "/info"]:
             cmd_info()
         elif lower in ["version", "/version"]:
@@ -778,7 +760,6 @@ def dashboard_command(command: str, argument: str, *, emit=None) -> str:
                 '/dream now          Consolidate memory & generate rehearsal exercises\n'
                 '/dream auto on|off  Toggle automatic background sleep mode\n'
                 '/dream research     Show grounding research papers\n'
-                '/mahakal            Display Mahakaal sacred artwork\n'
                 '/settings show      Show model configuration\n'
                 '/settings backend local|nano|ollama\n'
                 '/settings model-file "C:\\path\\model.gguf"\n'
@@ -819,16 +800,6 @@ def dashboard_command(command: str, argument: str, *, emit=None) -> str:
         '/auto': cmd_autonomous,
     }
     list_args = {'/settings': cmd_settings, '/memory': cmd_memory, '/dream': cmd_dream, '/convert': cmd_convert, '/mcp': cmd_mcp}
-    if command in ('/mahakal', '/shiva'):
-        mode = argument.strip().lower() if argument.strip() else 'trinetra'
-        from kiran_ai.cli.art import get_mahakal_panel
-        from rich.console import Console
-        import io
-        buf = io.StringIO()
-        console = Console(file=buf, color_system="truecolor", force_terminal=True, width=72)
-        panel = get_mahakal_panel(width=68, height_lines=12, mode=mode)
-        console.print(panel)
-        return buf.getvalue().strip()
     if command == '/cluster' and argument.lower().startswith('debate'):
         cmd_swarm(argument[6:].strip(), emit=lines.append)
     elif command in no_args:
@@ -927,8 +898,6 @@ def main():
         launch_chat(plain=parsed.plain or parsed.silent or cmd == "silent")
     elif cmd in ["swarm", "debate", "cluster-debate"]:
         cmd_swarm(" ".join(all_args))
-    elif cmd in ["mahakal", "shiva"]:
-        cmd_mahakal(all_args)
     elif cmd in ["takeover", "overlay"]:
         cmd_takeover()
     elif cmd == "ask":

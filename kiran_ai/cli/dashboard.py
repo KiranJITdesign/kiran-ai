@@ -15,7 +15,6 @@ from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
 from textual.widgets import Button, Footer, Input, Static
 
-from kiran_ai.cli.art import get_mahakal_braille, get_mahakal_text
 from kiran_ai.cli.command_prompts import CommandPrompt, missing_input_prompt
 from kiran_ai.cli.confidence import confidence_lines
 from kiran_ai.profile.creator import get_creator_profile
@@ -123,11 +122,9 @@ class CreatorCard(Static):
                     ('About', profile.professional_identity),
                     ('Inspiration', profile.spiritual_inspiration),
                     ('Motto', profile.personal_motto), ('GitHub', profile.github_url))
-        mahakal_art = get_mahakal_text(width=18, height_lines=8, bg_hex='#140c06')
         card = Table.grid(padding=(0, 2), expand=False)
         card.add_column()
-        card.add_column()
-        card.add_row(mahakal_art, info)
+        card.add_row(info)
         return card
 
 
@@ -209,10 +206,6 @@ class KiranDashboard(App):
                 yield Panel('✧ Capabilities', id='capabilities')
                 yield Panel('◉ Learning · Dream Engine', id='learning')
                 yield Panel('⌘ Cluster · Multi-KiranAI', id='cluster')
-                with Vertical(id='mahakal', classes='panel') as mahakal_panel:
-                    mahakal_panel.border_title = '✦ Mahakaal'
-                    yield Static(get_mahakal_braille(width=34, height_lines=18), id='mahakal-image',
-                                 classes='mahakal-art', markup=False)
                 with Vertical(id='quick-commands', classes='panel'):
                     yield Static('Quick Commands', classes='panel-heading')
                     yield Button('/status     Live system details', id='quick-status')
@@ -224,7 +217,6 @@ class KiranDashboard(App):
                     yield Button('/silent     Minimal terminal', id='quick-silent')
                     yield Button('/dream      Sleep consolidation', id='quick-dream')
                     yield Button('/memory     Session memory', id='quick-memory')
-                    yield Button('/mahakal    Mahakaal sacred art', id='quick-mahakal')
                     yield Button('/info       Creator profile', id='quick-info')
                     yield Button('/settings   Configure model', id='quick-settings')
                     yield Button('/clear      Start a new chat', id='quick-clear')
@@ -492,7 +484,7 @@ class KiranDashboard(App):
                     result = self.command_handler(command, argument)
                 if result:
                     self.post_message(ReplyPiece(result))
-                creator = command in ('/info', '/mahakal', '/shiva')
+                creator = command == '/info'
             else:
                 if command in chat_commands and not argument.strip():
                     raise ValueError(f'Usage: {command} <message>')
